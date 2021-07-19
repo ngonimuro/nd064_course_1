@@ -1,7 +1,7 @@
 <!doctype html>
     <title>Edit Model</title>
     <h2>Edit Model</h2>
-    <form method="post" action="/update">
+    <form method="POST" action="/save_update_model">
         <dl>
             <p>
                 <input name="" value="{{ model_row['model_id'] }}" placeholder="Model Code" autocomplete="off" disabled>
@@ -17,7 +17,7 @@
             </p>
             <p>
                 <select name="inputSelectMake">
-                    {% for make in make_rows %}
+                    {% for make in make_data %}
                         {% if make.make_id ==  model_row['key_make'] %}
                             <option value = "{{make.make_id}}" selected> 
                         {% else %}
@@ -25,6 +25,11 @@
                         {% endif %}                     
                         ({{make.make_abbreviation}}){{make.make_name}}
                         </option>
+                    {% endfor %}
+                </select>
+                <select name="inputSelectBody">
+                    {% for body in body_data %}
+                        <option value="{{body.body_id}}">{{body.body_type}}</option>
                     {% endfor %}
                 </select>
             </p>

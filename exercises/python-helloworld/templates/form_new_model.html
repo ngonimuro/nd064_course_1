@@ -1,0 +1,33 @@
+{% extends 'layout.html' %}
+
+{% block content %}
+    <form action="/save_new_model" method="POST">
+        <dl>
+            <p>
+                <input name="inputModelCode" value="" type="text" placeholder="Manufacturer Model Code" autocomplete="off" >
+            </p>
+            <p>
+                <input name="inputModelYear" value="" type="text" placeholder="Year" autocomplete="off" >
+            </p>
+            <p>
+                <input name="inputModelName" value="" type="text" placeholder="South African Model Name" autocomplete="off" >
+            </p>
+            <p>
+                <select name="selectMake">
+                    {% for make in make_data %}
+                      <option value="{{make.make_id}}">{{make.make_name}}({{make.make_abbreviation}})</option>
+                    {% endfor%}  
+                </select>
+                <select name="selectBody">
+                    {% for body in body_data %}
+                        <option value="{{body.body_id}}">{{body.body_type}}</option>
+                    {% endfor %}
+                </select>
+            </p>
+        </dl>
+        <p>
+            <input type="submit" value="Create Model">
+        </p>
+    </form>
+{% endblock %}
+
