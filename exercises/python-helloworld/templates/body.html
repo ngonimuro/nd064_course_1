@@ -1,8 +1,5 @@
 <!doctype html>
-    <title>List of Models</title>
-    
-    <p><a href="{{ url_for('.add_user_view') }}"> Add Model </a></p>
-    
+    <title>List of Models</title>   
     <p>
         {% with messages = get_flashed_messages() %}
           {% if messages %}
@@ -15,5 +12,5 @@
         {% endwith %}
     </p>    
     {% for body in body_data %}
-      <li>{{ body[0] }}</li>
+      <li>{{ body[0] }}</li> 
     {% endfor %}

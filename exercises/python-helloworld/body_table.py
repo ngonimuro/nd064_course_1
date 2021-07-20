@@ -1,6 +1,6 @@
 from flask_table import Table, Col, LinkCol
 
-class Classify(Table):
+class Bodies(Table):
     body_id = Col('Id', show=False)
     body_type = Col('Body')
     doors = Col('Doors')

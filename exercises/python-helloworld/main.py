@@ -1,9 +1,13 @@
+import pymysql
 from typing import NoReturn
 from app import app
 from db_config import mysql
 from tables import Results
 from flask import flash, render_template, request, redirect, jsonify
-import pymysql
+from werkzeug.utils import secure_filename
+import os
+import urllib.request 
+
 
 links = [
     {'name': 'Home', 'url': ''},
@@ -11,6 +15,12 @@ links = [
     {'name': 'Create Models', 'url': '/create'}
 ]
 
+UPLOAD_FOLDER = 'static/uploads'
+app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+ALLOWED_EXTENSIONS  = set(['png', 'jpg', 'jpeg','gif'])
+
+def allowed_file(filename):
+    return '.' in filename and filename.rsplit('.',1)[1].lower() in ALLOWED_EXTENSIONS
 
 @app.route('/')
 def home():
@@ -22,62 +32,60 @@ def home():
                            links=links
                            )
 
-@app.route('/classification')
-def classification():
+
+@app.route('/body')
+def view_body():
     conn = None
     cursor = None
-    _select = "SELECT body_id, body_type, doors, created, modified "
-    _from = " FROM body"
-    _sql = _select + _from
+    sql = "SELECT * FROM body"
     try:
         conn = mysql.connect()
         cursor = conn.cursor()
-        cursor.execute(_sql)
+        cursor.execute(sql)
         body_data = cursor.fetchall()
-        if body_data:
-            return render_template('body.html')		
-        else:
-            return 'No body types have been added to the system yet !'
+        return render_template('body.html', body_data=body_data)
     except Exception as e:
         print(e)
     finally:
         cursor.close()
         conn.close()
 
+
 @app.route('/new_classification')
 def create_classification():
     return render_template(
         'form_new_body.html',
         title="Create New Body",
-        description="Add new body type to the system",       
-	    field_titles="New Body",
+        description="Add new body type to the system",
+        field_titles="New Body",
     )
+
 
 @app.route('/save_classification', methods=['POST'])
 def save_classification():
-	conn = None
-	cursor = None
+    conn = None
+    cursor = None
 
-	try:
-		_type = request.form['bodyType']	
-		_doors = request.form['doors']
+    try:
+        _type = request.form['bodyType']
+        _doors = request.form['doors']
 
-		if _type and _doors and request.method == 'POST':
-			sql = "INSERT INTO body( body_type, doors) VALUES(%s, %s)"
-			data = (_type, _doors)
-			conn = mysql.connect()
-			cursor = conn.cursor()
-			cursor.execute(sql, data)
-			conn.commit()
-			return redirect('/classification')
-		else:
-			flash('Error while saving your data')
-			return redirect('/new_classification')
-	except Exception as e:
-		print(e)
-	finally:
-		cursor.close()
-		conn.close()
+        if _type and _doors and request.method == 'POST':
+            sql = "INSERT INTO body( body_type, doors) VALUES(%s, %s)"
+            data = (_type, _doors)
+            conn = mysql.connect()
+            cursor = conn.cursor()
+            cursor.execute(sql, data)
+            conn.commit()
+            return redirect('/classification')
+        else:
+            flash('Error while saving your data')
+            return redirect('/new_classification')
+    except Exception as e:
+        print(e)
+    finally:
+        cursor.close()
+        conn.close()
 
 
 @app.route('/models')
@@ -130,11 +138,11 @@ def edit_view(id):
         cursor.execute("Select body_id,body_type FROM body")
         body_data = cursor.fetchall()
         if model_row and make_data and body_data:
-            return render_template('form_edit_model.html', 
-                                    model_row=model_row, 
-                                    make_data=make_data, 
-                                    body_data=body_data
-            )
+            return render_template('form_edit_model.html',
+                                   model_row=model_row,
+                                   make_data=make_data,
+                                   body_data=body_data
+                                   )
         else:
             return 'Record #{id} is missing'.format(id=id)
     except Exception as e:
@@ -142,6 +150,7 @@ def edit_view(id):
     finally:
         cursor.close()
         conn.close()
+
 
 @app.route('/new_model')
 def create_new_model():
@@ -171,6 +180,7 @@ def create_new_model():
         cursor.close()
         conn.close()
 
+
 @app.route('/save_new_model', methods=['POST'])
 def save_new_model():
     conn = None
@@ -182,14 +192,21 @@ def save_new_model():
         _modelName = request.form['inputModelName']
         _selectMake = request.form['selectMake']
         _selectBody = request.form['selectBody']
+        files = request.files.getlist('files[]')        
 
-        
         if _modelCode and _year and _modelName and _selectMake and _selectBody and request.method == 'POST':
-            sql = "INSERT INTO model( model_code, model_year, model_name_za, key_make, key_body) VALUES('XRP','2020','NEW VEHICLE',3,3)"
+            print(files)
+            for file in files:
+                if file and allowed_file(file.filename):
+                    filename = secure_filename(file.filename)
+                    file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+                print(file)
+            flash('Upload Successful!')
+            sql = "INSERT INTO model( model_code, model_year, model_name_za, image_link, key_make, key_body,) VALUES(%s,%s,%s,%s,%s)"
             data = (_modelCode, _year, _modelName, _selectMake, _selectBody)
             conn = mysql.connect()
             cursor = conn.cursor()
-            cursor.execute(sql)
+            cursor.execute(sql,data)
             conn.commit()
             flash('Model Created Successfully')
             return redirect('/models')
@@ -197,14 +214,14 @@ def save_new_model():
             return 'One Of The Fields Entered Was Not In The Correct Format !!'
     except Exception as e:
         print(e)
-    finally: 
+    finally:
         cursor.close()
         conn.close()
 
 
 @app.route('/save_update_model', methods=['POST'])
 def save_update_model():
-    conn = None 
+    conn = None
     cursor = None
     try:
         _code = request.form['inputModelCode']
@@ -231,6 +248,7 @@ def save_update_model():
         cursor.close()
         conn.close()
 
+
 @app.route('/delete/<int:id>')
 def delete_user(id):
     conn = None
@@ -247,6 +265,7 @@ def delete_user(id):
     finally:
         cursor.close()
         conn.close()
+
 
 if __name__ == "__main__":
     app.run(host='0.0.0.0')

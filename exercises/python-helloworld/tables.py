@@ -1,5 +1,5 @@
 from flask_table import Table, Col, LinkCol
- 
+
 class Results(Table):
     model_id = Col('Id', show=False)
     model_code = Col('Code')

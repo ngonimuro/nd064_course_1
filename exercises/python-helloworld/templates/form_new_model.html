@@ -1,33 +1,69 @@
 {% extends 'layout.html' %}
 
 {% block content %}
-    <form action="/save_new_model" method="POST">
+
+    <form method="POST" action="/save_new_model" enctype="multipart/form-data" class="form_inline" >
         <dl>
-            <p>
-                <input name="inputModelCode" value="" type="text" placeholder="Manufacturer Model Code" autocomplete="off" >
-            </p>
-            <p>
-                <input name="inputModelYear" value="" type="text" placeholder="Year" autocomplete="off" >
-            </p>
-            <p>
-                <input name="inputModelName" value="" type="text" placeholder="South African Model Name" autocomplete="off" >
-            </p>
-            <p>
-                <select name="selectMake">
+            <div class="form-group">
+                <label>Manufacturer Code</label>
+                <input name="inputModelCode" value="" type="text" placeholder="Manufacturer Model Code" class="form-control" autocomplete="off">
+            </div>
+            <hr>
+            <div class="form-group">
+                <label>Year:</label>
+                <input name="inputModelYear" value="" type="text" placeholder="Year" class="form-control" autocomplete="off">
+            </div>
+            <hr>
+            <div class="form-group">
+                <label>Model Name in South Africa:</label>
+                <input name="inputModelName" value="" type="text" placeholder="South African Model Name" class="form-control" autocomplete="off">
+            </div>
+            <hr>
+            <div class="form-group">
+                <label>Manufacturer / Brand:</label>
+                <select name="selectMake" class="form-control">
                     {% for make in make_data %}
-                      <option value="{{make.make_id}}">{{make.make_name}}({{make.make_abbreviation}})</option>
-                    {% endfor%}  
+                    <option value="{{make.make_id}}">{{make.make_name}}({{make.make_abbreviation}})</option>
+                    {% endfor%}
                 </select>
-                <select name="selectBody">
+            </div>
+            <hr>
+            <div class="form-group">
+                <label>Model Type:</label>
+                <select name="selectBody" class="form-control">
                     {% for body in body_data %}
-                        <option value="{{body.body_id}}">{{body.body_type}}</option>
+                    <option value="{{body.body_id}}">{{body.body_type}}</option>
                     {% endfor %}
                 </select>
-            </p>
+            </div>
         </dl>
+        <div class="form-group">
+            <label>Upload Model Image:</label>
+            <input type="file" name="files[]" id="fileInput" class="form-control" multiple>
+        </div>
         <p>
-            <input type="submit" value="Create Model">
+            <input type="submit" name="submit" class="btn btn-success" value="Create Model" />
         </p>
     </form>
-{% endblock %}
+</div>
 
+<script>
+    $(document).ready(function(){
+     //File type validation
+        $("#fileInput").change(function(){
+            var fileLength = this.files.Length;
+            var match = ["image/jpeg", "image/png", "image/jpg", "image/gif"]
+            var i;
+            for (i=0; i < fileLength; i++){
+                var file = this.files[i];
+                var imagefile = file.type;
+                if(!((imagefile==match[0] || imagefile==match[1] || imagefile==match[2]|| imagefile==match[3] ))){
+                    alert('Select a valid image file (JPEG,JPG,PNG,GIF)');
+                    $("#fileInput").val('');
+                    return false;
+                }
+            }
+        })
+    })
+</script>
+{% endblock %}
