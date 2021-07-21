@@ -1,22 +1,23 @@
-<!doctype html>
+{% extends 'layout.html' %}
+{% block content %}
     <title>Edit Model</title>
     <h2>Edit Model</h2>
     <form method="POST" action="/save_update_model">
         <dl>
             <p>
-                <input name="" value="{{ model_row['model_id'] }}" placeholder="Model Code" autocomplete="off" disabled>
+                <input name="" value="{{ model_row['model_id'] }}" placeholder="Model Code" autocomplete="off" class="form-control" disabled>
             </p>
             <p>
-                <input name="inputModelCode" value="{{ model_row['model_code'] }}" type="text" placeholder="Model Code" autocomplete="off" required>
+                <input name="inputModelCode" value="{{ model_row['model_code'] }}" type="text" placeholder="Model Code" autocomplete="off" class="form-control" required>
             </p>
             <p>
-                <input name="inputModelYear" value="{{ model_row['model_year'] }}" type="text" placeholder="Model Year" autocomplete="off" required>
+                <input name="inputModelYear" value="{{ model_row['model_year'] }}" type="text" placeholder="Model Year" autocomplete="off" class="form-control" required>
             </p>
             <p>
-                <input name="inputModelName" value="{{ model_row['model_name_za'] }}" placeholder="Model Name" autocomplete="off" required>
+                <input name="inputModelName" value="{{ model_row['model_name_za'] }}" placeholder="Model Name" autocomplete="off" class="form-control" required>
             </p>
             <p>
-                <select name="inputSelectMake">
+                <select name="inputSelectMake" class="form-control">
                     {% for make in make_data %}
                         {% if make.make_id ==  model_row['key_make'] %}
                             <option value = "{{make.make_id}}" selected> 
@@ -27,15 +28,25 @@
                         </option>
                     {% endfor %}
                 </select>
-                <select name="inputSelectBody">
+            </p>
+            <p>
+                <select name="inputSelectBody" class="form-control">
                     {% for body in body_data %}
                         <option value="{{body.body_id}}">{{body.body_type}}</option>
                     {% endfor %}
                 </select>
             </p>
+            <p>
+                <div class="form-group">
+                    <label>Upload Model Image:</label>
+                    <input type="file" name="files[]" id="fileInput" class="form-control" multiple>
+                </div>
+            </p>
         </dl>
         <p>
             <input name="id" value="{{ model_row['model_id'] }}" type="hidden">
-            <input type="submit" value="Submit">
+            <input type="submit" value="Submit" class="btn btn-success">
         </p>
     </form>
+
+{% endblock %}

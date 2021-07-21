@@ -1,0 +1,35 @@
+{% extends 'layout.html' %}
+
+{% block content %}
+{% for model in model_data %}
+<div class="row">
+    <div class="caption">
+        <h3>Model Name : {{ model[2] }}</h3>
+        <p>
+            Model Year : {{ model[1]}}
+        </p>
+        <p>
+            Body Type : {{ model[5] }}
+        </p>
+
+
+
+        <p>
+            <a href="#" class="btn btn-primary" role="button">
+                Button
+            </a>
+
+            <a href="#" class="btn btn-default" role="button">
+                Button
+            </a>
+        </p>
+    </div>
+    <div class="col-sm-6 col-md-3">
+        <div class="thumbnail">
+            <img src="/static/uploads/{{ model[4] }}" alt="" class ="img-thumbnail" />
+            <img src="{{ url_for('.return_image',filename= model[4] ) }}" class="img-thumbnail"/>
+        </div>
+    </div>
+</div>
+{% endfor %}
+{% endblock %}

@@ -1,3 +1,4 @@
+from flask.helpers import send_from_directory
 import pymysql
 from typing import NoReturn
 from app import app
@@ -116,6 +117,32 @@ def models():
         cursor.close()
         conn.close()
 
+@app.route('/view_model/<int:id>')
+def view_model(id):
+    conn = None
+    cursor = None
+    try:
+        _sql = """SELECT a.model_code, a.model_year, a.model_name_za, a.model_name_kr,
+                b.ev_1,
+                c.body_type, c.doors
+                FROM model as a 
+                INNER JOIN images as b on a.model_name_za = b.model_name_za
+                INNER JOIN body as c on c.body_id = a.key_body
+                WHERE a.model_id = %s"""
+        conn=mysql.connect()
+        cursor=conn.cursor()
+        cursor.execute(_sql,id)
+        model_data = cursor.fetchall()
+        return render_template('view_model_detail.html',model_data = model_data)
+
+    except Exception as e:
+        print(e)
+    finally:
+        cursor.close()
+        conn.close
+@app.route('/return_image/<filename>')
+def return_image(filename):
+    return send_from_directory("/uploads/",filename)
 
 @app.route('/edit/<int:id>')
 def edit_view(id):
@@ -195,16 +222,36 @@ def save_new_model():
         files = request.files.getlist('files[]')        
 
         if _modelCode and _year and _modelName and _selectMake and _selectBody and request.method == 'POST':
-            print(files)
+            count = 1
+            columns = ""
+            image_names = ""
+            values_string = ""
+            conn = mysql.connect()
+            cursor = conn.cursor()
             for file in files:
                 if file and allowed_file(file.filename):
                     filename = secure_filename(file.filename)
                     file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+                    sql_images = "INSERT INTO images( model_name_za, ev_1) VALUES(%s, %s)"
+                    cursor.execute(sql_images,[_modelName, filename])
+                    conn.commit()
+                    # columns = columns + " ev_" + str(count) + ","
+                    # image_names =  image_names+ " "+ filename + ","
+                    # values_string += "%s,"
+                    
                 print(file)
-            flash('Upload Successful!')
-            sql = "INSERT INTO model( model_code, model_year, model_name_za, image_link, key_make, key_body,) VALUES(%s,%s,%s,%s,%s)"
+                flash('Upload Successful!')           
+                # count += 1
+            
+            # values_string = values_string.rstrip(values_string[-1])
+            # columns = columns.rstrip(columns[-1])
+            # image_names = image_names.rstrip(image_names[-1])
+            # sql_images = "INSERT INTO images( model_name_za, " + columns + ") VALUES(%s,"+ values_string +")"
+            # data_images = (_modelName, filename)
+            # cursor.execute(sql_images,data_images)
+            
+            sql = "INSERT INTO model( model_code, model_year, model_name_za, key_make, key_body) VALUES(%s,%s,%s,%s,%s)"
             data = (_modelCode, _year, _modelName, _selectMake, _selectBody)
-            conn = mysql.connect()
             cursor = conn.cursor()
             cursor.execute(sql,data)
             conn.commit()

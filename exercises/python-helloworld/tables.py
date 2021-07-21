@@ -9,5 +9,7 @@ class Results(Table):
     body_type = Col('Body')
     created=Col('Created')
     modified=Col('Modified')
+    view = LinkCol('View','view_model',url_kwargs=dict(id='model_id'))
     edit = LinkCol('Edit', 'edit_view', url_kwargs=dict(id='model_id'))
     delete = LinkCol('Delete ', 'delete_user', url_kwargs=dict(id='model_id'))
+    
