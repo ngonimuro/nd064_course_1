@@ -1,0 +1,24 @@
+{% extends 'layout.html' %}
+
+{% block content %}
+<p>
+    {% with messages = get_flashed_messages() %}
+      {% if messages %}
+        <ul class=flashes>
+        {% for message in messages %}
+          <li>{{ message }}</li>
+        {% endfor %}
+        </ul>
+      {% endif %}
+    {% endwith %}
+</p> 
+<form action="{{url_for('save_fuel_type')}}" method = "POST" class="form-inline">
+    <div class="form-group">
+        <label>Fuel Type:</label>
+        <input type="text" name="inputFuelType" id="inputSeries" placeholder="Engine Series" class="form-control" autocomplete="off">
+    </div>
+    <div class="form">
+        <input type="submit" name="submit" class="btn btn-success" value="Save Fuel Type">
+    </div>
+</form>
+{% endblock %}

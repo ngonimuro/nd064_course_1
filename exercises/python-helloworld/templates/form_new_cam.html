@@ -1,0 +1,24 @@
+{% extends 'layout.html' %}
+
+{% block content %}
+<p>
+    {% with messages = get_flashed_messages() %}
+      {% if messages %}
+        <ul class=flashes>
+        {% for message in messages %}
+          <li>{{ message }}</li>
+        {% endfor %}
+        </ul>
+      {% endif %}
+    {% endwith %}
+</p> 
+<form action="{{url_for('save_cam_type')}}" method = "POST" class="form-inline">
+    <div class="form-group">
+        <label>Cam Types:</label>
+        <input type="text" name="inputCam" id="inputCam" placeholder="CAM TYPE" class="form-control" autocomplete="off">
+    </div>
+    <div class="form">
+        <input type="submit" name="submit" class="btn btn-success" value="Save Cam Type ">
+    </div>
+</form>
+{% endblock %}

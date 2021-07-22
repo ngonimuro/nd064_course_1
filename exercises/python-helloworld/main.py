@@ -130,9 +130,11 @@ def view_model(id):
                 INNER JOIN body as c on c.body_id = a.key_body
                 WHERE a.model_id = %s"""
         conn=mysql.connect()
-        cursor=conn.cursor()
+        cursor=conn.cursor(pymysql.cursors.DictCursor)
         cursor.execute(_sql,id)
         model_data = cursor.fetchall()
+        for model in model_data:
+            print(model['ev_1'])
         return render_template('view_model_detail.html',model_data = model_data)
 
     except Exception as e:
@@ -295,6 +297,189 @@ def save_update_model():
         cursor.close()
         conn.close()
 
+@app.route('/view_engines')
+def view_engines():
+    conn = None
+    cursor = None
+    try:
+        conn = mysql.connect()
+        cursor=conn.cursor(pymysql.cursors.DictCursor)
+        _sql = """SELECT series, engine_number, name, key_fuel, key_turbo, key_cylinder, key_valves, cam, cvvt, injectors, power, created, modified 
+                FROM engine
+        """
+        cursor.execute(_sql)
+        engine_data = cursor.fetchall()
+        if engine_data:            
+            return render_template("view_engines.html",engine_data=engine_data)
+        else:
+            flash('No Engines Have Been Created in the system yet')
+            return redirect('/new_engine')
+    except Exception as e:
+        print(e)
+    finally:
+        cursor.close()
+        conn.close()
+
+@app.route('/new_engine')
+def new_engine():
+    conn = None
+    cursor = None
+    valves = [6,8,12,16,24,48]
+    injectors = [4,6,8]
+    try:
+        _sql_fuel="SELECT fuel_type_id, fuel_name FROM fuel_types"
+        _sql_cylinders="SELECT cylinder_id, number FROM engine_cylinders"
+        _sql_cam="SELECT cam_type_id, cam_type FROM cam_type"
+        _sql_cvvt="SELECT cvvt_id, cvvt_type FROM cvvt"
+        conn = mysql.connect()
+        cursor = conn.cursor(pymysql.cursors.DictCursor)
+        cursor.execute(_sql_fuel)
+        fuel_types=cursor.fetchall()
+        cursor.execute(_sql_cylinders)
+        cylinders=cursor.fetchall()
+        cursor.execute(_sql_cam)
+        cam_types=cursor.fetchall()
+        cursor.execute(_sql_cvvt)
+        vvt=cursor.fetchall()
+        if fuel_types and cylinders and cam_types and vvt:
+            return render_template(
+                                    'form_new_engine.html', 
+                                    fuel_types=fuel_types,
+                                    cylinders=cylinders,
+                                    valves=valves,
+                                    cam_types=cam_types,
+                                    vvt=vvt
+                                )
+        else:
+            return "Some Data Is Missing"
+    except Exception as e:
+        print(e)
+    finally:
+        cursor.close()
+        conn.close()
+
+@app.route('/new_fuel_types')
+def new_fuel_types():
+    flash('New Fuel Type has been created')
+    return render_template("form_new_fuel_types.html")
+
+@app.route('/save_fuel_type', methods=['POST'])
+def save_fuel_type():
+    conn = None
+    cursor = None
+    fuel = request.form['inputFuelType']
+    try:
+        if fuel and request.method == 'POST':
+            _sql = "INSERT INTO fuel_types(fuel_name) Values(%s)"
+            fuel_=fuel.upper()
+            _data = (fuel_,) 
+            conn = mysql.connect()
+            cursor = conn.cursor(pymysql.cursors.DictCursor)
+            cursor.execute(_sql, _data)
+            conn.commit()
+            flash('New Fuel Type Added')
+            return redirect('/new_fuel_types')
+        else:
+            flash('Fuel Type Not Created !!')
+            return redirect('/new_fuel_types')
+    except Exception as e:
+        print(e)
+    finally:
+        cursor.close()
+        conn.close()
+
+#Add a new number of cylinders that can be used to describe an engine e.g 1 - 2 - 4 - 6 etc
+@app.route('/new_cylinders_numbers')
+def new_cylinders_numbers():
+    flash('New Cylinder Numbers Have Been Added To The System')
+    return render_template("form_new_cylinders.html")
+
+#Save the number of cylinders to the database table engine_cylinders
+@app.route('/save_cylinders', methods=['POST'])
+def save_cylinders():
+    conn = None
+    cursor = None
+    cylinders = request.form['inputCylinders']
+    try:
+        if cylinders and request.method == 'POST':
+            _sql = "INSERT INTO engine_cylinders(number) Values(%s)"
+            _data = (cylinders) 
+            conn = mysql.connect()
+            cursor = conn.cursor(pymysql.cursors.DictCursor)
+            cursor.execute(_sql, _data)
+            conn.commit()
+            flash('New Cylinders Added')
+            return redirect('/new_cylinders_numbers')
+        else:
+            flash('New Cylinders NOT Added Created !!')
+            return redirect('/new_cylinders_numbers')
+    except Exception as e:
+        print(e)
+    finally:
+        cursor.close()
+        conn.close()
+
+#Add a new number of cylinders that can be used to describe an engine e.g 1 - 2 - 4 - 6 etc
+@app.route('/new_cam_types')
+def new_cam_types():
+    flash('New Cylinder Numbers Have Been Added To The System')
+    return render_template("form_new_cam.html")
+
+#Save the number of cylinders to the database table engine_cylinders
+@app.route('/save_cam_type', methods=['POST'])
+def save_cam_type():
+    conn = None
+    cursor = None
+    cam = request.form['inputCam']
+    try:
+        if cam and request.method == 'POST':
+            _sql = "INSERT INTO cam_type(cam_type) Values(%s)"
+            _data = (cam.upper(),) 
+            conn = mysql.connect()
+            cursor = conn.cursor(pymysql.cursors.DictCursor)
+            cursor.execute(_sql, _data)
+            conn.commit()
+            flash('New Cylinders Added')
+            return redirect('/new_cam_types')
+        else:
+            flash('New Cylinders NOT Added Created !!')
+            return redirect('/new_cam_types')
+    except Exception as e:
+        print(e)
+    finally:
+        cursor.close()
+        conn.close()
+
+#Add a new number of cylinders that can be used to describe an engine e.g 1 - 2 - 4 - 6 etc
+@app.route('/new_cvvt')
+def new_cvvt():
+    flash('New CVVT Have Been Added To The System')
+    return render_template("form_new_cvvt.html")
+
+#Save the number of cylinders to the database table engine_cylinders
+@app.route('/save_cvvt', methods=['POST'])
+def save_cvvt():
+    conn = None
+    cursor = None
+    cvvt = request.form['inputCvvt']
+    try:
+        if cvvt and request.method == 'POST':
+            _sql = "INSERT INTO cvvt(cvvt_type) Values(%s)"
+            _data = (cvvt.upper(),) 
+            conn = mysql.connect()
+            cursor = conn.cursor(pymysql.cursors.DictCursor)
+            cursor.execute(_sql, _data)
+            conn.commit()
+            flash('New CVVT Added')
+            return redirect('/new_cvvt')
+        else:
+            flash('New Cylinders NOT Added Created !!')
+            return redirect('/new_cvvt')
+    except Exception as e:
+        print(e)
+    finally:
+        cursor.close()
+        conn.close()
 
 @app.route('/delete/<int:id>')
 def delete_user(id):

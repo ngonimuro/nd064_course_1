@@ -1,0 +1,73 @@
+{% extends 'layout.html' %}
+{% block content %}
+<form action="/save_engine" method="POST" class="form-inline">
+    <div class="form-group">
+        <label>Engine Series:</label>
+        <input type="text" name="inputSeries" id="inputSeries" placeholder="Engine Series" class="form-control"
+            autocomplete="off">
+    </div>
+    <div class="form-group">
+        <label>Engine Number:</label>
+        <input type="text" name="inputEngineNumber" id="inputEngineNumber" placeholder="Engine Number"
+            class="form-control" autocomplete="off">
+    </div>
+    <div class="form-group">
+        <label>Engine Production Name:</label>
+        <input type="text" name="inputEngineName" id="inputEngine" placeholder="Engine Production Name"
+            class="form-control" autocomplete="off">
+    </div>
+    <div class="form-group">
+        <label>Fuel:</label>
+        <select name="selectFuel" id="selectFuel" class="form-control">
+            {% for fuel in fuel_types%}
+            <option value="{{fuel.fuel_type_id}}">{{fuel.fuel_name}}</option>
+            {% endfor %}
+        </select>
+    </div>
+    <div class="form-group radio">
+        <label>Turbo : <input type="radio" name="radioTurbo" id="radioTurboYes" class="radio">Yes</label>
+        <label><input type="radio" name="radioTurbo" id="radioTurboNo" class="radio"> No</label>
+    </div>
+    <div class="form-group">
+        <label>Cylinders:</label>
+        <select name="selectCylinder" id="selectCylinder" class="form-control">
+            {% for cylinder in cylinders %}
+            <option value="{{cylinder.cylinder_id}}">{{cylinder.number}}</option>
+            {% endfor %}
+        </select>
+    </div>
+    <div class="form-group">
+        <label>Valves:</label>
+        <select name="selectValves" id="selectValves" class="form-control">
+            {% for valve in valves%}
+            <option value="{{valve}}">{{valve}}</option>
+            {% endfor %}
+        </select>
+    </div>
+    <div class="form-group">
+        <label>Cam:</label>
+        <select name="selectCam" id="selectCam" class="form-control">
+            {% for cam in cam_types%}
+            <option value="{{cam.cam_id}}">{{cam.cam_type}}</option>
+            {% endfor %}
+        </select>
+    </div>
+    <div class="form-group">
+        <label>Valve Timing System (CVVT):</label>
+        <select name="selectCVVT" id="selectCVVT" class="form-control">
+            {%  for vt in vvt %}
+                <option value="{{vt.cvvt_id}}">{{vt.cvvt_type}}</option>
+            {% endfor %}
+        </select>
+    </div>
+    <div class="form-group">
+        <label>Injectors:</label>
+        <input type="number" name="inputInjector" id="inputInjector" placeholder="Injectors" class="form-control" autocomplete="off">
+    </div>
+    <div class="form-group">
+        <label>Power:</label>
+        <input type="text" name="inputPower" id="inputPower" placeholder="Power Output K/W" class="form-control"
+            autocomplete="off">
+    </div>
+</form>
+{% endblock %}
