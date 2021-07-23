@@ -48,7 +48,7 @@
         <label>Cam:</label>
         <select name="selectCam" id="selectCam" class="form-control">
             {% for cam in cam_types%}
-            <option value="{{cam.cam_id}}">{{cam.cam_type}}</option>
+            <option value="{{cam.cam_type_id}}">{{cam.cam_type}}</option>
             {% endfor %}
         </select>
     </div>
@@ -64,7 +64,7 @@
         <label>Injectors:</label>
         <select name="selectInjectors" id="selectInjectors" class="form-control">
             {% for injector in injectors%}
-                <option value="">{{injector}}</option>
+                <option value="{{ loop.index }}">{{injector}}</option>
             {% endfor %}
         </select>
     </div>

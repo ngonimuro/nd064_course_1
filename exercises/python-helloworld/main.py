@@ -375,11 +375,11 @@ def save_engine():
         injectors = request.form['selectInjectors']
         power = request.form['inputPower']
 
-        if series and number and name and fuel and turbo and cylinder and valves and cam and cvvt and injectors and power:
+        if series and number and name and fuel and turbo and cylinder and valves and cam and vt and injectors and power:
             try:
                 _sql = """ INSERT INTO 
-                        engine(series, engine_number, name, key_fuel, key_turbo, key_cylinder, key_values, key_cam, key_cvvt, injectors, power) 
-                        VALUES(%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+                        engine(series, engine_number, name, key_fuel, key_turbo, key_cylinder, key_valves, key_cam, key_cvvt, injectors, power) 
+                        VALUES(%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
                         """
                 data = (series, number, name, fuel, turbo, cylinder, valves, cam, vt, injectors, power)
                 conn = mysql.connect()
@@ -388,7 +388,6 @@ def save_engine():
                 conn.commit()
                 flash('New model Successfully added')
                 redirect('/new_engine')
-
             except Exception as e:
                 print(e)
             finally:
