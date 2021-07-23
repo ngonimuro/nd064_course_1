@@ -348,7 +348,8 @@ def new_engine():
                                     cylinders=cylinders,
                                     valves=valves,
                                     cam_types=cam_types,
-                                    vvt=vvt
+                                    vvt=vvt,
+                                    injectors=injectors 
                                 )
         else:
             return "Some Data Is Missing"
@@ -357,7 +358,46 @@ def new_engine():
     finally:
         cursor.close()
         conn.close()
+@app.route('/save_engine', methods=['POST'])
+def save_engine():
+    if request.method=='POST':
+        conn = None
+        cursor = None
+        series = request.form['inputSeries']
+        number = request.form['inputEngineNumber']
+        name = request.form['inputEngineName']
+        fuel = request.form['selectFuel']
+        turbo = request.form['radioTurbo']
+        cylinder = request.form['selectCylinder']
+        valves = request.form['selectValves']
+        cam = request.form['selectCam']
+        vt = request.form['valveTrain']
+        injectors = request.form['selectInjectors']
+        power = request.form['inputPower']
 
+        if series and number and name and fuel and turbo and cylinder and valves and cam and cvvt and injectors and power:
+            try:
+                _sql = """ INSERT INTO 
+                        engine(series, engine_number, name, key_fuel, key_turbo, key_cylinder, key_values, key_cam, key_cvvt, injectors, power) 
+                        VALUES(%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+                        """
+                data = (series, number, name, fuel, turbo, cylinder, valves, cam, vt, injectors, power)
+                conn = mysql.connect()
+                cursor = conn.cursor(pymysql.cursors.DictCursor)
+                cursor.execute(_sql, data)
+                conn.commit()
+                flash('New model Successfully added')
+                redirect('/new_engine')
+
+            except Exception as e:
+                print(e)
+            finally:
+                cursor.close()
+                conn.close()
+        else:
+            return "Some Data is missing"
+    else:
+        return "invalid Access"
 @app.route('/new_fuel_types')
 def new_fuel_types():
     flash('New Fuel Type has been created')
